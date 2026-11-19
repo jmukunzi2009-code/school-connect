@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="380" viewBox="0 0 560 380" fill="none">
+  <rect x="34" y="24" width="492" height="332" rx="38" fill="#F2FBFF"/>
+  <circle cx="466" cy="73" r="22" fill="#FFE19A"/>
+  <rect x="74" y="63" width="186" height="132" rx="15" fill="#C5EDFF"/>
+  <path d="M167 63v132M74 129h186" stroke="#fff" stroke-width="9"/>
+  <path d="M91 93c22-22 45-22 67 0v36H91V93Z" fill="#7CCCF0"/>
+  <path d="M176 93c22-22 45-22 67 0v36h-67V93Z" fill="#95D5F2"/>
+  <path d="M91 153c22-22 45-22 67 0v25H91v-25Z" fill="#94D8F4"/>
+  <path d="M176 153c22-22 45-22 67 0v25h-67v-25Z" fill="#7CCCF0"/>
+  <rect x="322" y="63" width="150" height="91" rx="14" fill="#fff" stroke="#D7EBF5" stroke-width="3"/>
+  <path d="M345 96h101M345 117h72" stroke="#AED7EA" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="354" cy="252" r="39" fill="#F5B58D"/>
+  <path d="M316 249c-1-35 17-57 43-57 29 0 44 21 41 48-10-11-20-17-35-20-9 12-26 20-49 22v7Z" fill="#354E71"/>
+  <path d="M286 347c3-51 26-75 68-75 39 0 65 25 68 75H286Z" fill="#1687D1"/>
+  <path d="M324 279l30 32 30-32" fill="#fff"/>
+  <path d="M348 310h13l9 37h-30l8-37Z" fill="#F2B84B"/>
+  <circle cx="178" cy="270" r="31" fill="#9A5E43"/>
+  <path d="M147 267c2-29 17-44 37-44 21 0 34 14 33 37-8-7-17-11-28-13-8 9-21 15-42 17v3Z" fill="#292F49"/>
+  <path d="M123 350c2-44 21-65 57-65s55 21 58 65H123Z" fill="#FFCF74"/>
+  <circle cx="268" cy="277" r="29" fill="#E8A37E"/>
+  <path d="M239 274c0-25 12-41 31-41 20 0 32 16 31 39-8-8-17-12-29-14-7 9-18 14-33 16Z" fill="#693F37"/>
+  <path d="M226 350c2-40 18-58 45-58 29 0 45 18 47 58H226Z" fill="#A4D7B5"/>
+  <rect x="96" y="328" width="209" height="20" rx="10" fill="#D9EEF7"/>
+  <rect x="427" y="277" width="49" height="71" rx="9" fill="#B5E4F6"/>
+  <path d="M451 279v-43m0 22c-18-1-24-12-23-23 13 0 23 8 23 23Zm1-4c0-14 9-24 23-25 1 13-7 23-23 25Z" stroke="#43A776" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M454 251c-9-9-18-14-26-16m24 7c7-10 14-15 22-18" stroke="#43A776" stroke-width="5" stroke-linecap="round"/>
+</svg>
