@@ -180,7 +180,7 @@ export default function DashboardOverviewPage() {
                 {s.activeSchools} Active Workspaces
               </div>
             </div>
-            <div className="stat-icon-wrap" style={{ backgroundColor: 'rgba(18, 59, 42, 0.1)', color: 'var(--color-forest)' }}>
+            <div className="stat-icon-wrap" style={{ backgroundColor: 'rgba(18, 90, 145, 0.1)', color: 'var(--color-forest)' }}>
               <Building size={24} />
             </div>
           </div>
@@ -340,7 +340,7 @@ export default function DashboardOverviewPage() {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '10px 14px',
-                  backgroundColor: 'rgba(18, 59, 42, 0.03)',
+                  backgroundColor: 'rgba(18, 90, 145, 0.03)',
                   borderRadius: '6px',
                   fontSize: '0.88rem',
                 }}
@@ -398,7 +398,7 @@ export default function DashboardOverviewPage() {
   const overviewCards = [
     { label: t('dashboard.students'), value: s.totalStudents ?? 0, detail: t('dashboard.activeSchool'), icon: Users, color: '#1687D1' },
     { label: t('dashboard.classes'), value: s.totalClasses ?? 0, detail: t('dashboard.teachingGroups'), icon: BookOpen, color: '#7C5CE7' },
-    ...(permissions.canViewRoster ? [
+    ...(permissions.canViewRoster && roleKey !== 'class_teacher' ? [
       { label: t('dashboard.staff'), value: s.totalStaff ?? 0, detail: t('dashboard.teamMembers'), icon: GraduationCap, color: '#16865D' },
     ] : []),
     ...(permissions.canViewFinance ? [
@@ -671,7 +671,7 @@ export default function DashboardOverviewPage() {
                       style={{
                         padding: '4px 10px',
                         borderRadius: '6px',
-                        backgroundColor: 'rgba(18, 59, 42, 0.08)',
+                        backgroundColor: 'rgba(18, 90, 145, 0.08)',
                         color: 'var(--color-forest)',
                         fontSize: '0.8rem',
                         fontWeight: 600,
@@ -703,7 +703,7 @@ export default function DashboardOverviewPage() {
               style={{
                 padding: '16px 20px',
                 borderRadius: '8px',
-                backgroundColor: 'rgba(18, 59, 42, 0.03)',
+                backgroundColor: 'rgba(18, 90, 145, 0.03)',
                 border: '1px solid var(--border-color)',
               }}
             >

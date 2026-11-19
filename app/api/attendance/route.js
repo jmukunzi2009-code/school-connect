@@ -18,6 +18,13 @@ export async function GET(request) {
     if (!schoolId) {
       return NextResponse.json({ error: 'No active school assigned' }, { status: 400 });
     }
+    const isTeachingRole = ['teacher', 'class_teacher'].includes(user.activeRole);
+    const teacherFilter = isTeachingRole
+      ? `AND (
+           EXISTS (SELECT 1 FROM class_teachers ct WHERE ct.class_id = c.id AND ct.school_id = c.school_id AND ct.user_id = $2)
+           OR EXISTS (SELECT 1 FROM teacher_assignments ta WHERE ta.class_id = c.id AND ta.teacher_id = $2)
+         )`
+      : '';
 
     // Fetch classes & streams
     const classesRes = await query(
@@ -25,22 +32,39 @@ export async function GET(request) {
               COALESCE(json_agg(json_build_object('id', st.id, 'name', st.name)) FILTER (WHERE st.id IS NOT NULL), '[]') as streams
        FROM classes c
        LEFT JOIN streams st ON st.class_id = c.id
-       WHERE c.school_id = $1
+       WHERE c.school_id = $1 ${teacherFilter}
        GROUP BY c.id, c.name
        ORDER BY c.grade_level ASC`,
-      [schoolId]
+      isTeachingRole ? [schoolId, user.id] : [schoolId]
     );
 
     // If class and stream provided, fetch enrolled students along with attendance record for the date
     let students = [];
     if (classId) {
+      if (isTeachingRole) {
+        const assignedClassRes = await query(
+          `SELECT c.id
+           FROM classes c
+           WHERE c.id = $1 AND c.school_id = $2
+             AND (
+               EXISTS (SELECT 1 FROM class_teachers ct WHERE ct.class_id = c.id AND ct.school_id = c.school_id AND ct.user_id = $3)
+               OR EXISTS (SELECT 1 FROM teacher_assignments ta WHERE ta.class_id = c.id AND ta.teacher_id = $3)
+             )
+           LIMIT 1`,
+          [classId, schoolId, user.id]
+        );
+        if (!assignedClassRes.rows.length) {
+          return NextResponse.json({ error: 'This class is not assigned to your account.' }, { status: 404 });
+        }
+      }
+
       let q = `
         SELECT s.id as student_id, s.admission_number, s.first_name, s.last_name, s.gender,
                sa.status as attendance_status, sa.remarks
         FROM enrollments e
         JOIN students s ON s.id = e.student_id
         LEFT JOIN student_attendance sa ON sa.student_id = s.id AND sa.date = $3
-        WHERE e.school_id = $1 AND e.class_id = $2 AND e.status = 'active'
+        WHERE e.school_id = $1 AND e.class_id = $2 AND e.status = 'active' AND s.school_id = $1
       `;
       const params = [schoolId, classId, date];
       if (streamId) {
@@ -83,6 +107,36 @@ export async function POST(request) {
 
     if (!class_id || !date || !Array.isArray(records)) {
       return NextResponse.json({ error: 'Class, date, and attendance records are required.' }, { status: 400 });
+    }
+
+    const isTeachingRole = ['teacher', 'class_teacher'].includes(user.activeRole);
+    const classAccessRes = await query(
+      `SELECT c.id
+       FROM classes c
+       WHERE c.id = $1 AND c.school_id = $2
+         AND (
+           $3::boolean = false
+           OR EXISTS (SELECT 1 FROM class_teachers ct WHERE ct.class_id = c.id AND ct.school_id = c.school_id AND ct.user_id = $4)
+           OR EXISTS (SELECT 1 FROM teacher_assignments ta WHERE ta.class_id = c.id AND ta.teacher_id = $4)
+         )
+       LIMIT 1`,
+      [class_id, schoolId, isTeachingRole, user.id]
+    );
+    if (!classAccessRes.rows.length) {
+      return NextResponse.json({ error: 'This class is not assigned to your account.' }, { status: 404 });
+    }
+
+    const studentIds = [...new Set(records.map((record) => record.student_id))];
+    const enrolledStudentsRes = await query(
+      `SELECT COUNT(DISTINCT e.student_id)::int AS count
+       FROM enrollments e
+       JOIN students s ON s.id = e.student_id
+       WHERE e.school_id = $1 AND e.class_id = $2 AND e.status = 'active'
+         AND s.school_id = $1 AND e.student_id = ANY($3::uuid[])`,
+      [schoolId, class_id, studentIds]
+    );
+    if (Number(enrolledStudentsRes.rows[0].count) !== studentIds.length) {
+      return NextResponse.json({ error: 'Attendance can only be recorded for students enrolled in this class.' }, { status: 400 });
     }
 
     // Save attendance for each student

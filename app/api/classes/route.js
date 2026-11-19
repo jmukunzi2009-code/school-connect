@@ -16,8 +16,8 @@ export async function GET(request) {
 
     // Get all classes with teacher assignments
     const classesRes = await query(
-      `SELECT c.id, c.name, c.level, c.capacity,
-              (SELECT COUNT(*)::int FROM enrollments e WHERE e.class_id = c.id AND e.status = 'active') AS student_count,
+      `SELECT c.id, c.name, c.grade_level AS level,
+              (SELECT COUNT(*)::int FROM enrollments e WHERE e.school_id = c.school_id AND e.class_id = c.id AND e.status = 'active') AS student_count,
               ct.user_id AS class_teacher_id,
               u.full_name AS class_teacher_name,
               u.email AS class_teacher_email
@@ -27,20 +27,24 @@ export async function GET(request) {
        )
        LEFT JOIN users u ON u.id = ct.user_id
        WHERE c.school_id = $1
-       ORDER BY c.level, c.name`,
+       ORDER BY c.grade_level, c.name`,
       [schoolId]
     );
 
     if (classId) {
+      if (!classesRes.rows.some((schoolClass) => schoolClass.id === classId)) {
+        return NextResponse.json({ error: 'Class not found in your active school.' }, { status: 404 });
+      }
+
       // Get students in class
       const studentsRes = await query(
         `SELECT s.id, s.first_name, s.last_name, s.admission_number, s.gender, s.date_of_birth,
                 e.id AS enrollment_id, e.roll_number
          FROM enrollments e
          JOIN students s ON s.id = e.student_id
-         WHERE e.class_id = $1 AND e.status = 'active'
+         WHERE e.school_id = $2 AND e.class_id = $1 AND e.status = 'active'
          ORDER BY s.last_name, s.first_name`,
-        [classId]
+        [classId, schoolId]
       );
 
       // Get subject teachers for this class
@@ -49,7 +53,7 @@ export async function GET(request) {
                 u.id AS teacher_id, u.full_name AS teacher_name
          FROM teacher_assignments ts
          JOIN subjects sub ON sub.id = ts.subject_id
-         JOIN users u ON u.id = ts.user_id
+         JOIN users u ON u.id = ts.teacher_id
          WHERE ts.class_id = $1 AND ts.school_id = $2
          ORDER BY sub.name`,
         [classId, schoolId]
@@ -117,14 +121,29 @@ export async function POST(request) {
     if (action === 'assign_class_teacher') {
       const { class_id, teacher_user_id, academic_year_id } = body;
 
-      // Get or create academic year
-      let yearId = academic_year_id;
-      if (!yearId) {
-        const yr = await query(`SELECT id FROM academic_years WHERE school_id=$1 AND is_current=true LIMIT 1`, [schoolId]);
-        yearId = yr.rows[0]?.id;
-      }
+      const yearRes = await query(
+        `SELECT id FROM academic_years
+         WHERE school_id = $1 AND is_current = true
+           AND ($2::uuid IS NULL OR id = $2)
+         LIMIT 1`,
+        [schoolId, academic_year_id || null]
+      );
+      const yearId = yearRes.rows[0]?.id;
+      if (!yearId) return NextResponse.json({ error: 'Select or create the active academic year before assigning a class teacher.' }, { status: 400 });
 
-      if (!yearId) return NextResponse.json({ error: 'No active academic year. Create one first.' }, { status: 400 });
+      const eligibilityRes = await query(
+        `SELECT c.id AS class_id, u.id AS teacher_id
+         FROM classes c
+         JOIN users u ON u.id = $3 AND u.is_active = true
+         JOIN user_memberships m ON m.user_id = u.id AND m.school_id = c.school_id
+           AND m.status = 'active' AND m.role IN ('teacher', 'class_teacher')
+         WHERE c.id = $1 AND c.school_id = $2
+         LIMIT 1`,
+        [class_id, schoolId, teacher_user_id]
+      );
+      if (!eligibilityRes.rows.length) {
+        return NextResponse.json({ error: 'Choose an active teacher and a class from your school.' }, { status: 400 });
+      }
 
       // Upsert class teacher
       await query(
@@ -152,12 +171,36 @@ export async function POST(request) {
     // ── Assign Subject Teacher to Class ──
     if (action === 'assign_subject_teacher') {
       const { class_id, teacher_user_id, subject_id } = body;
+      const yearRes = await query(
+        `SELECT id FROM academic_years
+         WHERE school_id = $1 AND is_current = true
+         LIMIT 1`,
+        [schoolId]
+      );
+      const yearId = yearRes.rows[0]?.id;
+      if (!yearId) return NextResponse.json({ error: 'Create or select an active academic year before assigning subject teachers.' }, { status: 400 });
+
+      const eligibilityRes = await query(
+        `SELECT c.id AS class_id, u.id AS teacher_id, sub.id AS subject_id
+         FROM classes c
+         JOIN users u ON u.id = $3 AND u.is_active = true
+         JOIN user_memberships m ON m.user_id = u.id AND m.school_id = c.school_id
+           AND m.status = 'active' AND m.role IN ('teacher', 'class_teacher', 'director_of_studies', 'headteacher')
+         JOIN subjects sub ON sub.id = $4 AND sub.school_id = c.school_id
+         WHERE c.id = $1 AND c.school_id = $2
+         LIMIT 1`,
+        [class_id, schoolId, teacher_user_id, subject_id]
+      );
+      if (!eligibilityRes.rows.length) {
+        return NextResponse.json({ error: 'Choose an active teacher, subject, and class from your school.' }, { status: 400 });
+      }
 
       await query(
-        `INSERT INTO teacher_assignments (school_id, class_id, user_id, subject_id)
-         VALUES ($1,$2,$3,$4)
-         ON CONFLICT (class_id, subject_id) DO UPDATE SET user_id = EXCLUDED.user_id`,
-        [schoolId, class_id, teacher_user_id, subject_id]
+        `INSERT INTO teacher_assignments (school_id, class_id, teacher_id, subject_id, academic_year_id)
+         VALUES ($1,$2,$3,$4,$5)
+         ON CONFLICT (class_id, subject_id) DO UPDATE
+         SET teacher_id = EXCLUDED.teacher_id, academic_year_id = EXCLUDED.academic_year_id`,
+        [schoolId, class_id, teacher_user_id, subject_id, yearId]
       );
 
       await query(
@@ -177,17 +220,18 @@ export async function POST(request) {
          FROM enrollments e
          JOIN students s ON s.id = e.student_id
          JOIN classes c ON c.id = e.class_id
-         WHERE e.id = $1`,
-        [enrollment_id]
+         WHERE e.id = $1 AND e.school_id = $2 AND s.school_id = $2 AND c.school_id = $2`,
+        [enrollment_id, schoolId]
       );
       if (!enrRes.rows.length) return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 });
 
       const enr = enrRes.rows[0];
-      const toClassRes = await query(`SELECT name FROM classes WHERE id=$1`, [to_class_id]);
+      const toClassRes = await query(`SELECT name FROM classes WHERE id=$1 AND school_id=$2`, [to_class_id, schoolId]);
+      if (!toClassRes.rows.length) return NextResponse.json({ error: 'Target class not found in your school.' }, { status: 404 });
       const toClassName = toClassRes.rows[0]?.name || to_class_id;
 
       // Update enrollment to new class
-      await query(`UPDATE enrollments SET class_id=$1 WHERE id=$2`, [to_class_id, enrollment_id]);
+      await query(`UPDATE enrollments SET class_id=$1 WHERE id=$2 AND school_id=$3`, [to_class_id, enrollment_id, schoolId]);
 
       await query(
         `INSERT INTO audit_logs (school_id, user_id, action, module, details) VALUES ($1,$2,'STUDENT_PROMOTED','academics',$3)`,

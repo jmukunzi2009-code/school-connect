@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="380" viewBox="0 0 560 380" fill="none">
+  <defs>
+    <linearGradient id="panel" x1="72" y1="42" x2="473" y2="344" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset="1" stop-color="#E9F7FF"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="169" y1="114" x2="361" y2="319" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#39B6E9"/>
+      <stop offset="1" stop-color="#0876B8"/>
+    </linearGradient>
+  </defs>
+  <rect x="38" y="24" width="484" height="332" rx="34" fill="url(#panel)"/>
+  <circle cx="448" cy="79" r="37" fill="#D9F1FF"/>
+  <rect x="77" y="57" width="267" height="175" rx="18" fill="#fff" stroke="#D8EAF6" stroke-width="3"/>
+  <rect x="97" y="77" width="100" height="13" rx="6.5" fill="#125A91"/>
+  <rect x="97" y="100" width="151" height="8" rx="4" fill="#D7EAF5"/>
+  <path d="M105 193c31-42 52-28 74-54 21-24 42 13 61-2 17-14 30-28 56-23" stroke="url(#blue)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M105 207h213" stroke="#E3F0F7" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="190" cy="275" r="30" fill="#E5A37E"/>
+  <path d="M160 272c1-26 13-41 31-41 19 0 30 14 29 36-8-7-17-10-28-12-8 9-17 14-32 17Z" fill="#344C6A"/>
+  <path d="M129 346c3-44 21-64 61-64s58 20 61 64H129Z" fill="#1687D1"/>
+  <circle cx="343" cy="282" r="25" fill="#9A5E43"/>
+  <path d="M318 280c1-24 12-38 27-38 17 0 27 13 26 34-8-6-16-9-26-10-7 8-15 12-27 14Z" fill="#292F49"/>
+  <path d="M291 347c2-37 18-54 54-54s52 17 55 54H291Z" fill="#74C8EB"/>
+  <circle cx="437" cy="289" r="24" fill="#F0B18C"/>
+  <path d="M413 287c1-22 11-35 26-35 16 0 25 12 24 31-7-6-14-8-24-9-7 7-14 11-26 13Z" fill="#4B3D36"/>
+  <path d="M389 347c2-35 17-51 49-51s48 16 50 51H389Z" fill="#FFCF74"/>
+  <rect x="365" y="102" width="104" height="103" rx="16" fill="#fff" stroke="#D8EAF6" stroke-width="3"/>
+  <circle cx="417" cy="143" r="23" fill="#E5F5FF"/>
+  <path d="M406 143l8 8 15-18" stroke="#1687D1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="392" y="176" width="50" height="7" rx="3.5" fill="#B5DDF1"/>
+</svg>

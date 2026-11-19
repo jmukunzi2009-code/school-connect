@@ -18,14 +18,24 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import {
   BookOpen, Users, Award, CalendarCheck, MessageSquare, ChevronRight,
   ArrowLeft, CheckCircle2, AlertCircle, X, Edit2, PlusCircle,
   UserCheck, TrendingUp, Layers, FileText, Star,
 } from 'lucide-react';
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 const gradeColor = (g) => {
-  if (!g) return '#5E6D62';
+  if (!g) return '#60798C';
   if (g.startsWith('A')) return '#1E7E4A';
   if (g.startsWith('B')) return '#226F8A';
   if (g.startsWith('C')) return '#B47214';
@@ -103,6 +113,20 @@ export default function MyClassPage() {
     const present = records.filter(a => a.status === 'present').length;
     return Math.round((present / records.length) * 100);
   };
+  const attendanceTrend = Array.from(
+    attendance.reduce((daily, record) => {
+      const date = String(record.date).slice(0, 10);
+      const day = daily.get(date) || { date, present: 0 };
+      if (record.status === 'present') day.present += 1;
+      daily.set(date, day);
+      return daily;
+    }, new Map()),
+    ([, day]) => ({
+      ...day,
+      label: new Date(`${day.date}T00:00:00`).toLocaleDateString(undefined, { weekday: 'short' }),
+      rate: students.length ? Math.round((day.present / students.length) * 100) : 0,
+    })
+  ).sort((a, b) => a.date.localeCompare(b.date));
 
   const handleAddComment = async (e) => {
     e.preventDefault();
@@ -129,7 +153,7 @@ export default function MyClassPage() {
       {/* Header */}
       <div style={{ marginBottom: '28px' }}>
         {view === 'class' && (
-          <button onClick={() => { setView('list'); setSelectedClass(null); }} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', background: 'none', border: 'none', cursor: 'pointer', color: '#5E6D62', fontSize: '0.85rem', fontWeight: 600 }}>
+          <button onClick={() => { setView('list'); setSelectedClass(null); }} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', background: 'none', border: 'none', cursor: 'pointer', color: '#60798C', fontSize: '0.85rem', fontWeight: 600 }}>
             <ArrowLeft size={15} /> My Classes
           </button>
         )}
@@ -141,6 +165,23 @@ export default function MyClassPage() {
           {view === 'list' ? 'Your assigned classes and subjects.' : `${students.length} students · ${mySubjects.length} subject${mySubjects.length !== 1 ? 's' : ''} you teach`}
         </p>
       </div>
+
+      {view === 'list' && (
+        <section className="class-workspace-banner">
+          <div>
+            <span className="class-workspace-kicker">Your teaching workspace</span>
+            <h2>Every assigned class, all in one place.</h2>
+            <p>Open a class to review its roster, follow attendance trends, and stay up to date with student progress.</p>
+          </div>
+          <Image
+            src="/images/class-management.svg"
+            alt="Teacher and students reviewing class progress"
+            width={230}
+            height={160}
+            priority
+          />
+        </section>
+      )}
 
       {error && <div style={alertS('#FDE8E8','#A51D24')}><AlertCircle size={14} /> {error} <button onClick={() => setError(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#A51D24' }}><X size={13} /></button></div>}
       {success && <div style={alertS('#E8F5EE','#126338')}><CheckCircle2 size={14} /> {success}</div>}
@@ -159,11 +200,11 @@ export default function MyClassPage() {
               {myClasses.map(cls => (
                 <button key={cls.id} onClick={() => openClass(cls)}
                   style={{ background: 'var(--bg-surface)', border: `2px solid ${cls.is_class_teacher ? '#D6AD55' : 'var(--border-color)'}`, borderRadius: '16px', padding: '22px', textAlign: 'left', cursor: 'pointer', display: 'block', width: '100%', transition: 'all 0.2s' }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(18,59,42,0.12)'; }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(18,90,145,0.12)'; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
-                    <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: cls.is_class_teacher ? 'linear-gradient(135deg,#D6AD55,#C29A44)' : 'linear-gradient(135deg,#123B2A,#1E6A45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {cls.is_class_teacher ? <UserCheck size={20} color="#0B241B" /> : <BookOpen size={20} color="#D6AD55" />}
+                    <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: cls.is_class_teacher ? 'linear-gradient(135deg,#D6AD55,#C29A44)' : 'linear-gradient(135deg,#125A91,#1687D1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {cls.is_class_teacher ? <UserCheck size={20} color="#0B3557" /> : <BookOpen size={20} color="#D6AD55" />}
                     </div>
                     <ChevronRight size={16} color="#9BAEA2" />
                   </div>
@@ -196,7 +237,7 @@ export default function MyClassPage() {
               ...(isClassTeacher ? [['teachers', 'Subject Teachers', Layers]] : []),
             ].map(([id, label, Icon]) => (
               <button key={id} onClick={() => setActiveTab(id)}
-                style={{ padding: '10px 20px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '6px', color: activeTab === id ? '#123B2A' : 'var(--text-secondary)', borderBottom: activeTab === id ? '2px solid #123B2A' : '2px solid transparent', marginBottom: '-2px', transition: 'all 0.2s' }}>
+                style={{ padding: '10px 20px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '6px', color: activeTab === id ? '#125A91' : 'var(--text-secondary)', borderBottom: activeTab === id ? '2px solid #125A91' : '2px solid transparent', marginBottom: '-2px', transition: 'all 0.2s' }}>
                 <Icon size={15} /> {label}
               </button>
             ))}
@@ -228,7 +269,7 @@ export default function MyClassPage() {
                             <td style={{ padding: '11px 16px', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{i + 1}</td>
                             <td style={{ padding: '11px 16px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg,#123B2A,#1E6A45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700, color: '#D6AD55', flexShrink: 0 }}>
+                                <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg,#125A91,#1687D1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700, color: '#D6AD55', flexShrink: 0 }}>
                                   {s.first_name?.charAt(0)}
                                 </div>
                                 <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{s.first_name} {s.last_name}</span>
@@ -303,26 +344,57 @@ export default function MyClassPage() {
 
               {/* ── Attendance ── */}
               {activeTab === 'attendance' && (
-                <div style={{ background: 'var(--bg-surface)', borderRadius: '14px', border: '1px solid var(--border-color)', padding: '24px' }}>
-                  <div style={{ fontWeight: 800, marginBottom: '16px' }}>Recent Attendance (Last 7 Days)</div>
+                <div className="class-attendance-panel">
+                  <div className="class-attendance-heading">
+                    <div>
+                      <h2>Attendance trend</h2>
+                      <p>Daily attendance for {selectedClass.name} over the last 7 days</p>
+                    </div>
+                    <div className="class-attendance-summary">
+                      <span>Class size</span>
+                      <strong>{students.length}</strong>
+                    </div>
+                  </div>
                   {attendance.length === 0 ? (
-                    <div style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '32px' }}>No attendance records yet. Use the Attendance module to mark daily rolls.</div>
+                    <div className="class-attendance-empty">No attendance records yet. Use the Attendance module to mark daily rolls.</div>
                   ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {students.map(s => {
-                        const recs = attendance.filter(a => a.student_id === s.id);
-                        const present = recs.filter(a => a.status === 'present').length;
+                    <div className="class-attendance-chart">
+                      <ResponsiveContainer width="100%" height={260}>
+                        <AreaChart data={attendanceTrend} margin={{ top: 10, right: 12, left: -18, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="classAttendanceFill" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#1687D1" stopOpacity={0.28} />
+                              <stop offset="95%" stopColor="#1687D1" stopOpacity={0.02} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid stroke="var(--border-color)" strokeDasharray="4 4" vertical={false} />
+                          <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#60798C', fontSize: 12 }} />
+                          <YAxis domain={[0, 100]} unit="%" axisLine={false} tickLine={false} tick={{ fill: '#60798C', fontSize: 12 }} />
+                          <Tooltip formatter={(value) => [`${value}%`, 'Attendance']} />
+                          <Area type="monotone" dataKey="rate" stroke="#1687D1" strokeWidth={3} fill="url(#classAttendanceFill)" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                  {attendance.length > 0 && (
+                    <div className="class-attendance-list">
+                      {students.map(student => {
+                        const records = attendance.filter(record => record.student_id === student.id);
+                        const present = records.filter(record => record.status === 'present').length;
+                        const rate = records.length ? Math.round((present / records.length) * 100) : null;
                         return (
-                          <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', borderRadius: '10px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)' }}>
-                            <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-primary)', flex: 1 }}>{s.first_name} {s.last_name}</div>
-                            <div style={{ display: 'flex', gap: '4px' }}>
-                              {recs.slice(0, 7).map((r, ri) => (
-                                <div key={ri} title={`${r.date}: ${r.status}`} style={{ width: '20px', height: '20px', borderRadius: '4px', background: r.status === 'present' ? '#1E7E4A' : r.status === 'absent' ? '#C0392B' : '#B47214', cursor: 'help' }} />
+                          <div className="class-attendance-row" key={student.id}>
+                            <span>{student.first_name} {student.last_name}</span>
+                            <span className="class-attendance-dots">
+                              {records.slice(0, 7).map((record, index) => (
+                                <span
+                                  key={`${record.date}-${index}`}
+                                  title={`${record.date}: ${record.status}`}
+                                  className={`class-attendance-dot is-${record.status}`}
+                                />
                               ))}
-                            </div>
-                            <div style={{ fontWeight: 700, fontSize: '0.82rem', color: recs.length ? (present / recs.length >= 0.9 ? '#1E7E4A' : '#B47214') : '#9BAEA2' }}>
-                              {recs.length ? `${Math.round((present / recs.length) * 100)}%` : '—'}
-                            </div>
+                            </span>
+                            <strong>{rate !== null ? `${rate}%` : '—'}</strong>
                           </div>
                         );
                       })}
@@ -368,10 +440,10 @@ export default function MyClassPage() {
                 placeholder="Write your observation about this student…"
                 style={{ width: '100%', padding: '10px 13px', borderRadius: '10px', border: '1.5px solid var(--border-color)', fontSize: '0.9rem', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: 'inherit', outline: 'none', resize: 'vertical', marginBottom: '14px' }} />
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '20px', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
-                <input type="checkbox" checked={isPrivate} onChange={e => setIsPrivate(e.target.checked)} style={{ accentColor: '#123B2A', width: '16px', height: '16px' }} />
+                <input type="checkbox" checked={isPrivate} onChange={e => setIsPrivate(e.target.checked)} style={{ accentColor: '#125A91', width: '16px', height: '16px' }} />
                 Private (only class teacher and school admin can see this)
               </label>
-              <button type="submit" disabled={submitting} style={{ width: '100%', padding: '11px', borderRadius: '10px', background: '#123B2A', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer' }}>
+              <button type="submit" disabled={submitting} style={{ width: '100%', padding: '11px', borderRadius: '10px', background: '#125A91', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer' }}>
                 {submitting ? 'Saving…' : 'Add Comment'}
               </button>
             </form>

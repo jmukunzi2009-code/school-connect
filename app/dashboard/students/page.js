@@ -392,7 +392,7 @@ export default function StudentsDirectoryPage() {
               </div>
 
               {/* Class & Stream Assignment */}
-              <div style={{ backgroundColor: 'rgba(18, 59, 42, 0.04)', padding: '16px', borderRadius: '8px', marginBottom: '16px' }}>
+              <div style={{ backgroundColor: 'rgba(18, 90, 145, 0.04)', padding: '16px', borderRadius: '8px', marginBottom: '16px' }}>
                 <div style={{ fontWeight: 700, color: 'var(--color-forest)', marginBottom: '10px', fontSize: '0.92rem' }}>
                   Class & Stream Enrollment:
                 </div>

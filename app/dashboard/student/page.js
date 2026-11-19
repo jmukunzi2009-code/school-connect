@@ -56,7 +56,7 @@ export default function StudentDashboard() {
               Welcome{user ? `, ${user.full_name}` : ''}! Here's your academic overview for Term 2, 2026.
             </p>
           </div>
-          <div style={{ background: 'linear-gradient(135deg, #123B2A, #1E6A45)', borderRadius: '14px', padding: '14px 20px', color: '#fff', textAlign: 'right' }}>
+          <div style={{ background: 'linear-gradient(135deg, #125A91, #1687D1)', borderRadius: '14px', padding: '14px 20px', color: '#fff', textAlign: 'right' }}>
             <div style={{ fontSize: '0.75rem', opacity: 0.7, fontWeight: 600 }}>CLASS</div>
             <div style={{ fontSize: '1rem', fontWeight: 800 }}>Form 3A</div>
             <div style={{ fontSize: '0.75rem', opacity: 0.7, marginTop: '2px' }}>ADM-2024-001</div>
@@ -69,7 +69,7 @@ export default function StudentDashboard() {
         {[
           { label: 'Attendance', val: '94.2%', icon: CalendarCheck, color: '#1E7E4A' },
           { label: 'Overall Grade', val: 'B+', icon: Award, color: '#226F8A' },
-          { label: 'Subjects', val: subjects.length, icon: BookOpen, color: '#123B2A' },
+          { label: 'Subjects', val: subjects.length, icon: BookOpen, color: '#125A91' },
           { label: 'Pending Tasks', val: subjects.reduce((a, s) => a + s.homework, 0), icon: CheckCircle2, color: '#B47214' },
         ].map(s => {
           const Icon = s.icon;

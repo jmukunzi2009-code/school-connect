@@ -89,7 +89,7 @@ export default function ParentDashboard() {
                 display: 'flex', alignItems: 'center', gap: '12px',
                 padding: '12px 20px', borderRadius: '12px',
                 border: `2px solid ${activeChild === i ? 'var(--color-forest)' : 'var(--border-color)'}`,
-                background: activeChild === i ? 'rgba(18,59,42,0.06)' : 'var(--bg-surface)',
+                background: activeChild === i ? 'rgba(18,90,145,0.06)' : 'var(--bg-surface)',
                 cursor: 'pointer', transition: 'all 0.2s',
               }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: `hsl(${i * 60 + 120}, 50%, 75%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, color: '#fff' }}>
@@ -110,7 +110,7 @@ export default function ParentDashboard() {
           { label: 'Attendance Rate', val: `${child.attendance}%`, icon: CalendarCheck, color: '#1E7E4A', trend: '+2.1%' },
           { label: 'Average Grade', val: child.avgGrade, icon: Award, color: '#226F8A', trend: 'Term 2' },
           { label: 'Fee Balance', val: child.feeBalance > 0 ? `RWF ${child.feeBalance.toLocaleString()}` : 'Paid ✓', icon: CreditCard, color: child.feeBalance > 0 ? '#C0392B' : '#1E7E4A', trend: child.feeBalance > 0 ? 'Outstanding' : 'All clear' },
-          { label: 'Absences This Term', val: child.recentAbsences, icon: Clock, color: child.recentAbsences > 3 ? '#B47214' : '#5E6D62', trend: child.recentAbsences === 0 ? 'Perfect!' : 'days' },
+          { label: 'Absences This Term', val: child.recentAbsences, icon: Clock, color: child.recentAbsences > 3 ? '#B47214' : '#60798C', trend: child.recentAbsences === 0 ? 'Perfect!' : 'days' },
         ].map(s => {
           const Icon = s.icon;
           return (
@@ -173,7 +173,7 @@ export default function ParentDashboard() {
             <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '16px' }}>Quick Actions</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               {[
-                { label: 'View Report Card', icon: BookOpen, color: '#123B2A' },
+                { label: 'View Report Card', icon: BookOpen, color: '#125A91' },
                 { label: 'Fee Statement', icon: CreditCard, color: '#226F8A' },
                 { label: 'Contact Teacher', icon: Phone, color: '#1E7E4A' },
                 { label: 'Attendance Log', icon: CalendarCheck, color: '#B47214' },

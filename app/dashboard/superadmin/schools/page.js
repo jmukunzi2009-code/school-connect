@@ -20,7 +20,7 @@ const schools = [
 export default function SuperAdminSchoolsPage() {
 
   const summaryStats = [
-    { label: 'Active schools', value: '128', icon: Building, tone: '#123B2A' },
+    { label: 'Active schools', value: '128', icon: Building, tone: '#125A91' },
     { label: 'Students onboarded', value: '12,840', icon: Users, tone: '#1E7E4A' },
     { label: 'Secure tenants', value: '99.9%', icon: ShieldCheck, tone: '#D6AD55' },
   ];

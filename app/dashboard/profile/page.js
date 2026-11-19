@@ -25,11 +25,11 @@ export default function ProfilePage() {
           <div style={{ background: 'var(--bg-surface)', borderRadius: '20px', padding: '32px 24px', border: '1px solid var(--border-color)', textAlign: 'center', marginBottom: '16px' }}>
             {/* Avatar */}
             <div style={{ position: 'relative', display: 'inline-block', marginBottom: '16px' }}>
-              <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: 'linear-gradient(135deg, #123B2A, #1E6A45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 800, color: '#D6AD55', margin: '0 auto', boxShadow: '0 8px 24px rgba(18,59,42,0.25)' }}>
+              <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: 'linear-gradient(135deg, #125A91, #1687D1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 800, color: '#D6AD55', margin: '0 auto', boxShadow: '0 8px 24px rgba(18,90,145,0.25)' }}>
                 {user.full_name?.charAt(0) || 'U'}
               </div>
               <button style={{ position: 'absolute', bottom: 0, right: 0, width: '28px', height: '28px', borderRadius: '50%', background: '#D6AD55', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                <Camera size={12} color="#0B241B" />
+                <Camera size={12} color="#0B3557" />
               </button>
             </div>
 
@@ -39,7 +39,7 @@ export default function ProfilePage() {
             {/* Role badges */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center' }}>
               {(user.roles || [user.activeRole]).filter(Boolean).map(role => (
-                <span key={role} style={{ padding: '4px 10px', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, background: 'rgba(18,59,42,0.08)', color: '#123B2A', border: '1px solid rgba(18,59,42,0.15)' }}>
+                <span key={role} style={{ padding: '4px 10px', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, background: 'rgba(18,90,145,0.08)', color: '#125A91', border: '1px solid rgba(18,90,145,0.15)' }}>
                   {role?.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                 </span>
               ))}

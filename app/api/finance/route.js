@@ -33,9 +33,9 @@ export async function GET(request) {
                 s.id as student_id, s.admission_number, s.first_name, s.last_name, s.gender
          FROM invoices i
          JOIN students s ON s.id = i.student_id
-         JOIN enrollments e ON e.student_id = s.id AND e.class_id = $2 AND e.status = 'active'
+         JOIN enrollments e ON e.student_id = s.id AND e.school_id = $1 AND e.class_id = $2 AND e.status = 'active'
          JOIN classes c ON c.id = e.class_id AND c.school_id = $1
-         WHERE i.school_id = $1
+         WHERE i.school_id = $1 AND s.school_id = $1
          ORDER BY s.last_name, s.first_name`,
         [schoolId, classId]
       );
@@ -44,7 +44,7 @@ export async function GET(request) {
 
     // ── Overview: group invoices by class ──
     const classesRes = await query(
-      `SELECT c.id, c.name, c.level,
+      `SELECT c.id, c.name, c.grade_level AS level,
               COUNT(DISTINCT e.student_id)::int AS student_count,
               COALESCE(SUM(i.total_amount), 0)::float AS total_invoiced,
               COALESCE(SUM(i.amount_paid), 0)::float AS total_collected,
@@ -54,11 +54,11 @@ export async function GET(request) {
                    THEN ROUND((SUM(i.amount_paid) / SUM(i.total_amount)) * 100)
                    ELSE 0 END AS paid_pct
        FROM classes c
-       LEFT JOIN enrollments e ON e.class_id = c.id AND e.status = 'active'
+       LEFT JOIN enrollments e ON e.school_id = c.school_id AND e.class_id = c.id AND e.status = 'active'
        LEFT JOIN invoices i ON i.student_id = e.student_id AND i.school_id = c.school_id
        WHERE c.school_id = $1
-       GROUP BY c.id, c.name, c.level
-       ORDER BY c.level, c.name`,
+       GROUP BY c.id, c.name, c.grade_level
+       ORDER BY c.grade_level, c.name`,
       [schoolId]
     );
 

@@ -129,7 +129,7 @@ export default function AcademicsPage() {
                 padding: '18px 20px',
                 borderRadius: '10px',
                 border: '1px solid var(--border-color)',
-                backgroundColor: 'rgba(18, 59, 42, 0.02)',
+                backgroundColor: 'rgba(18, 90, 145, 0.02)',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
@@ -148,7 +148,7 @@ export default function AcademicsPage() {
                     style={{
                       padding: '4px 12px',
                       borderRadius: '16px',
-                      backgroundColor: 'rgba(18, 59, 42, 0.1)',
+                      backgroundColor: 'rgba(18, 90, 145, 0.1)',
                       color: 'var(--color-forest)',
                       fontSize: '0.8rem',
                       fontWeight: 700,

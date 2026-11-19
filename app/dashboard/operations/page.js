@@ -108,7 +108,7 @@ export default function OperationsPage() {
           const Icon = tab.icon;
           return (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              style={{ padding: '10px 20px', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '7px', fontWeight: 700, fontSize: '0.88rem', color: activeTab === tab.id ? '#123B2A' : 'var(--text-secondary)', borderBottom: activeTab === tab.id ? '2px solid #123B2A' : '2px solid transparent', marginBottom: '-2px', transition: 'all 0.2s' }}>
+              style={{ padding: '10px 20px', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '7px', fontWeight: 700, fontSize: '0.88rem', color: activeTab === tab.id ? '#125A91' : 'var(--text-secondary)', borderBottom: activeTab === tab.id ? '2px solid #125A91' : '2px solid transparent', marginBottom: '-2px', transition: 'all 0.2s' }}>
               <Icon size={15} /> {tab.label}
             </button>
           );
@@ -121,7 +121,7 @@ export default function OperationsPage() {
           {/* Stats */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px', marginBottom: '24px' }}>
             {[
-              { label: 'Total Items', val: INVENTORY.length, color: '#123B2A', icon: Package },
+              { label: 'Total Items', val: INVENTORY.length, color: '#125A91', icon: Package },
               { label: 'Low Stock Alerts', val: INVENTORY.filter(i => i.qty <= i.min_qty).length, color: '#C0392B', icon: AlertCircle },
               { label: 'Total Value', val: `RWF ${FMT(INVENTORY.reduce((a, i) => a + i.qty * i.unit_cost, 0))}`, color: '#226F8A', icon: BarChart3 },
               { label: 'Categories', val: new Set(INVENTORY.map(i => i.category)).size, color: '#1E7E4A', icon: Layers },
@@ -140,7 +140,7 @@ export default function OperationsPage() {
             <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>Stock Register</span>
               {['storekeeper','school_admin'].includes(userRole) && (
-                <button style={{ padding: '8px 14px', borderRadius: '8px', background: '#123B2A', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <button style={{ padding: '8px 14px', borderRadius: '8px', background: '#125A91', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <Plus size={14} /> Add Item
                 </button>
               )}
@@ -205,7 +205,7 @@ export default function OperationsPage() {
                 {CAFETERIA_MENU.map((day, i) => (
                   <div key={day.day} style={{ padding: '14px 20px', borderBottom: i < CAFETERIA_MENU.length - 1 ? '1px solid var(--border-color)' : 'none', background: i % 2 === 1 ? 'var(--bg-primary)' : 'transparent' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                      <span style={{ fontWeight: 800, color: '#123B2A', fontSize: '0.88rem' }}>{day.day}</span>
+                      <span style={{ fontWeight: 800, color: '#125A91', fontSize: '0.88rem' }}>{day.day}</span>
                       <span style={{ fontSize: '0.76rem', color: '#1E7E4A', fontWeight: 700, background: '#E8F5EE', padding: '2px 8px', borderRadius: '8px' }}>
                         {day.students_fed} fed
                       </span>
@@ -257,7 +257,7 @@ export default function OperationsPage() {
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>Purchase Requests ({PURCHASE_REQUESTS.length})</div>
             {['procurement_officer','school_admin'].includes(userRole) && (
-              <button style={{ padding: '8px 14px', borderRadius: '8px', background: '#123B2A', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <button style={{ padding: '8px 14px', borderRadius: '8px', background: '#125A91', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <Plus size={14} /> New Request
               </button>
             )}
@@ -268,10 +268,10 @@ export default function OperationsPage() {
                 approved: { bg: '#E8F5EE', color: '#126338' },
                 pending: { bg: '#FFF6E5', color: '#925807' },
                 rejected: { bg: '#FDE8E8', color: '#A51D24' },
-              }[pr.status] || { bg: '#F0F2F0', color: '#5E6D62' };
+              }[pr.status] || { bg: '#F0F2F0', color: '#60798C' };
               return (
                 <div key={pr.id} style={{ padding: '18px 20px', borderBottom: i < PURCHASE_REQUESTS.length - 1 ? '1px solid var(--border-color)' : 'none', display: 'grid', gridTemplateColumns: 'auto 1fr auto auto', gap: '16px', alignItems: 'center' }}>
-                  <div style={{ fontWeight: 800, color: '#123B2A', fontSize: '0.84rem', fontFamily: 'monospace' }}>{pr.id}</div>
+                  <div style={{ fontWeight: 800, color: '#125A91', fontSize: '0.84rem', fontFamily: 'monospace' }}>{pr.id}</div>
                   <div>
                     <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9rem', marginBottom: '3px' }}>{pr.item}</div>
                     <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>
@@ -312,11 +312,11 @@ export default function OperationsPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-color)' }}>
                   <div>
                     <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '2px' }}>STUDENTS</div>
-                    <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#123B2A' }}>{bus.students}</div>
+                    <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#125A91' }}>{bus.students}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '2px' }}>CAPACITY</div>
-                    <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#5E6D62' }}>{bus.capacity}</div>
+                    <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#60798C' }}>{bus.capacity}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '2px' }}>LOAD</div>

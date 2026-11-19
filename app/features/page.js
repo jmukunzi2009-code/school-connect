@@ -2,8 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
+import BrandLogo from '@/components/brand-logo';
 import {
-  GraduationCap,
   Users,
   BookOpen,
   CalendarCheck,
@@ -33,15 +33,10 @@ const MODULE_LIST = [
 export default function FeaturesPage() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <header style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid var(--border-color)', padding: '16px 24px' }}>
+      <header className="public-site-header" style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid var(--border-color)', padding: '16px 24px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: 'var(--color-forest)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-gold)' }}>
-              <GraduationCap size={22} />
-            </div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-forest)' }}>
-              SchoolConnect <span style={{ color: 'var(--color-gold)' }}>360</span>
-            </div>
+          <Link href="/" aria-label="SchoolConnect 360 home">
+            <BrandLogo />
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <Link href="/" style={{ fontSize: '0.92rem', color: 'var(--text-secondary)' }}>Home</Link>
@@ -75,7 +70,7 @@ export default function FeaturesPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '10px',
-                      backgroundColor: 'rgba(18, 59, 42, 0.08)',
+                      backgroundColor: 'rgba(18, 90, 145, 0.08)',
                       color: 'var(--color-forest)',
                       display: 'flex',
                       alignItems: 'center',

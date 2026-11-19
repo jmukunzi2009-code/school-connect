@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { GraduationCap, Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react';
+import BrandLogo from '@/components/brand-logo';
+import { Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react';
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -17,15 +18,10 @@ export default function ContactPage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <header style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid var(--border-color)', padding: '16px 24px' }}>
+      <header className="public-site-header" style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid var(--border-color)', padding: '16px 24px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: 'var(--color-forest)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-gold)' }}>
-              <GraduationCap size={22} />
-            </div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-forest)' }}>
-              SchoolConnect <span style={{ color: 'var(--color-gold)' }}>360</span>
-            </div>
+          <Link href="/" aria-label="SchoolConnect 360 home">
+            <BrandLogo />
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <Link href="/" style={{ fontSize: '0.92rem', color: 'var(--text-secondary)' }}>Home</Link>

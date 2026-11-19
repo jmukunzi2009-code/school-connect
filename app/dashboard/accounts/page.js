@@ -138,7 +138,7 @@ export default function AccountsPage() {
       {toast && (
         <div style={{
           position: 'fixed', top: '20px', right: '20px', zIndex: 999,
-          backgroundColor: toast.type === 'success' ? '#123B2A' : '#8B2D2D',
+          backgroundColor: toast.type === 'success' ? '#125A91' : '#8B2D2D',
           color: '#fff', padding: '14px 20px', borderRadius: '10px',
           boxShadow: '0 4px 20px rgba(0,0,0,0.25)', display: 'flex', alignItems: 'center', gap: '10px',
           animation: 'slideIn 0.3s ease',
@@ -234,7 +234,7 @@ export default function AccountsPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <div style={{
                           width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
-                          background: 'linear-gradient(135deg, #123B2A, #1A6B35)',
+                          background: 'linear-gradient(135deg, #125A91, #1A6B35)',
                           color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontWeight: 700, fontSize: '0.9rem',
                         }}>

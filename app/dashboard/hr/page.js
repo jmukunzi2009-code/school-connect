@@ -36,7 +36,7 @@ export default function HRDashboard() {
     approved: { label: 'Approved', bg: '#E8F5EE', color: '#1E7E4A' },
     pending: { label: 'Pending', bg: '#FEF8EE', color: '#B47214' },
     rejected: { label: 'Rejected', bg: '#FEF0EE', color: '#C0392B' },
-  }[s] || { label: s, bg: '#F0F2F0', color: '#5E6D62' });
+  }[s] || { label: s, bg: '#F0F2F0', color: '#60798C' });
 
   return (
     <div style={{ padding: '32px', maxWidth: '1200px' }}>
@@ -48,7 +48,7 @@ export default function HRDashboard() {
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '28px' }}>
         {[
-          { label: 'Total Staff', val: 32, icon: Users, color: '#123B2A', sub: 'All departments' },
+          { label: 'Total Staff', val: 32, icon: Users, color: '#125A91', sub: 'All departments' },
           { label: 'On Leave Today', val: 2, icon: Clock, color: '#B47214', sub: '6.25% of staff' },
           { label: 'Pending Requests', val: 2, icon: CheckSquare, color: '#226F8A', sub: 'Awaiting review' },
           { label: 'Avg Attendance', val: '94.2%', icon: CalendarCheck, color: '#1E7E4A', sub: 'This month' },
@@ -102,7 +102,7 @@ export default function HRDashboard() {
                     <tr key={s.id} style={{ borderBottom: '1px solid var(--border-color)', background: i % 2 === 0 ? 'transparent' : 'var(--bg-primary)' }}>
                       <td style={{ padding: '14px 16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #123B2A, #1E6A45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700, color: '#D6AD55', flexShrink: 0 }}>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #125A91, #1687D1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700, color: '#D6AD55', flexShrink: 0 }}>
                             {s.name.split(' ').slice(-1)[0].charAt(0)}
                           </div>
                           <div>

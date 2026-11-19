@@ -61,8 +61,8 @@ export default function FinancePage() {
       try {
         setLoading(true);
         const res = await fetch('/api/finance');
-        if (!res.ok) throw new Error('Failed to load finance data');
         const d = await res.json();
+        if (!res.ok) throw new Error(d.error || 'Failed to load finance data.');
         setActiveRole(d.role);
         setCurrency(d.currency || 'RWF');
         setClasses(d.classes || []);
@@ -187,13 +187,13 @@ export default function FinancePage() {
   if (loading) return <Loading />;
 
   return (
-    <div style={{ padding: '28px', maxWidth: '1300px' }}>
+    <div className="dashboard-finance-page" style={{ padding: '28px', maxWidth: '1300px' }}>
       {/* ══ Header ══ */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '28px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           {view === 'students' && (
             <button onClick={() => { setView('classes'); setSelectedClass(null); setStudents([]); }}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', background: 'none', border: 'none', cursor: 'pointer', color: '#5E6D62', fontSize: '0.85rem', fontWeight: 600 }}>
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', background: 'none', border: 'none', cursor: 'pointer', color: '#60798C', fontSize: '0.85rem', fontWeight: 600 }}>
               <ArrowLeft size={15} /> {t('finance.backClasses')}
             </button>
           )}
@@ -204,7 +204,7 @@ export default function FinancePage() {
             {view === 'classes' ? t('finance.classesPrompt') : t('finance.studentsCount').replace('{count}', filteredStudents.length)}
           </p>
         </div>
-        {!canPay && (
+        {activeRole && !canPay && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#FFF8EE', border: '1px solid #F0D88A', borderRadius: '10px', padding: '10px 16px', fontSize: '0.85rem', color: '#6B4D00' }}>
             <FileText size={15} /> {t('finance.viewOnly')}
           </div>
@@ -221,9 +221,9 @@ export default function FinancePage() {
       {view === 'classes' && (
         <>
           {/* Summary stats */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(210px,1fr))', gap: '16px', marginBottom: '28px' }}>
+          <div className="finance-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(210px,1fr))', gap: '16px', marginBottom: '28px' }}>
             {[
-              { label: t('finance.totalInvoiced'), val: formatMoney(totals.total_invoiced), color: '#123B2A', icon: FileText },
+              { label: t('finance.totalInvoiced'), val: formatMoney(totals.total_invoiced), color: '#125A91', icon: FileText },
               { label: t('finance.totalCollected'), val: formatMoney(totals.total_collected), color: '#1E7E4A', icon: CheckCircle2 },
               { label: t('finance.outstanding'), val: formatMoney(totals.total_outstanding), color: '#B47214', icon: AlertCircle },
               { label: t('finance.collectionRate'), val: `${pct(totals.total_collected, totals.total_invoiced)}%`, color: '#226F8A', icon: TrendingUp },
@@ -290,7 +290,7 @@ export default function FinancePage() {
                 return (
                   <button key={cls.id} onClick={() => openClass(cls)}
                     style={{ background: 'var(--bg-surface)', borderRadius: '16px', padding: '22px', border: '1.5px solid var(--border-color)', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', display: 'block', width: '100%' }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#123B2A'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(18,59,42,0.12)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#125A91'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(18,90,145,0.12)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'translateY(0)'; }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
                       <div>
@@ -312,7 +312,7 @@ export default function FinancePage() {
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
                       <span style={{ color: '#B47214', fontWeight: 700 }}>{t('finance.outstanding')}: {formatMoney(cls.total_outstanding)}</span>
-                      <span style={{ color: '#123B2A', fontWeight: 700 }}>{t('dashboard.viewProfile')} →</span>
+                      <span style={{ color: '#125A91', fontWeight: 700 }}>{t('dashboard.viewProfile')} →</span>
                     </div>
                   </button>
                 );
@@ -336,7 +336,7 @@ export default function FinancePage() {
                   <tbody>
                     {payments.slice(0, 10).map(p => (
                       <tr key={p.id} style={{ borderTop: '1px solid var(--border-color)' }}>
-                        <td style={{ padding: '12px 16px', fontWeight: 700, color: '#123B2A' }}>{p.receipt_number}</td>
+                        <td style={{ padding: '12px 16px', fontWeight: 700, color: '#125A91' }}>{p.receipt_number}</td>
                         <td style={{ padding: '12px 16px' }}>
                           <div style={{ fontWeight: 600 }}>{p.first_name} {p.last_name}</div>
                           <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>{p.admission_number}</div>
@@ -349,7 +349,7 @@ export default function FinancePage() {
                         <td style={{ padding: '12px 16px', color: 'var(--text-secondary)', fontSize: '0.84rem' }}>{new Date(p.payment_date).toLocaleDateString(locale)}</td>
                         <td style={{ padding: '12px 16px' }}>
                           <button onClick={() => setReceiptModal({ ...p, studentName: `${p.first_name} ${p.last_name}`, receiptNumber: p.receipt_number, date: p.payment_date, paymentMethod: p.payment_method })}
-                            style={{ fontSize: '0.78rem', color: '#123B2A', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            style={{ fontSize: '0.78rem', color: '#125A91', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <Printer size={13} /> {t('finance.receipt')}
                           </button>
                         </td>
@@ -370,7 +370,7 @@ export default function FinancePage() {
         <>
           {/* Class summary banner */}
           {selectedClass && (
-            <div style={{ background: 'linear-gradient(135deg, #123B2A, #1E6A45)', borderRadius: '16px', padding: '20px 24px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+            <div style={{ background: 'linear-gradient(135deg, #125A91, #1687D1)', borderRadius: '16px', padding: '20px 24px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
               <div>
                 <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.78rem', fontWeight: 600, marginBottom: '4px' }}>{t('finance.class').toUpperCase()}</div>
                 <div style={{ color: '#fff', fontWeight: 900, fontSize: '1.4rem' }}>{selectedClass.name}</div>
@@ -391,7 +391,7 @@ export default function FinancePage() {
 
           {/* Search */}
           <div style={{ position: 'relative', marginBottom: '20px', maxWidth: '400px' }}>
-            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#5E6D62' }} />
+            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#60798C' }} />
             <input value={search} onChange={e => setSearch(e.target.value)}
               placeholder={t('finance.searchStudent')}
               style={{ width: '100%', padding: '10px 14px 10px 36px', borderRadius: '10px', border: '1.5px solid var(--border-color)', fontSize: '0.9rem', background: 'var(--bg-surface)', color: 'var(--text-primary)', fontFamily: 'inherit' }} />
@@ -418,7 +418,7 @@ export default function FinancePage() {
                       <tr key={inv.id} style={{ borderTop: '1px solid var(--border-color)', background: i % 2 === 1 ? 'var(--bg-primary)' : 'transparent' }}>
                         <td style={{ padding: '13px 16px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg,#123B2A,#1E6A45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700, color: '#D6AD55', flexShrink: 0 }}>
+                            <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg,#125A91,#1687D1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700, color: '#D6AD55', flexShrink: 0 }}>
                               {inv.first_name?.charAt(0)}
                             </div>
                             <div>
@@ -447,7 +447,7 @@ export default function FinancePage() {
                           <td style={{ padding: '13px 16px' }}>
                             {bal > 0 ? (
                               <button onClick={() => openPay(inv)}
-                                style={{ background: 'linear-gradient(135deg,#D6AD55,#C29A44)', color: '#0B241B', border: 'none', borderRadius: '8px', padding: '7px 14px', fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                style={{ background: 'linear-gradient(135deg,#D6AD55,#C29A44)', color: '#0B3557', border: 'none', borderRadius: '8px', padding: '7px 14px', fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
                                 <CreditCard size={13} /> {t('finance.recordPay')}
                               </button>
                             ) : (
@@ -504,13 +504,13 @@ export default function FinancePage() {
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
               {[payModal.balance, Math.round(payModal.balance / 2), 50000, 100000].filter((v, i, a) => v > 0 && v <= payModal.balance && a.indexOf(v) === i).map(v => (
                 <button key={v} type="button" onClick={() => setPayAmount(String(v))}
-                  style={{ padding: '5px 12px', borderRadius: '8px', border: '1.5px solid var(--border-color)', background: payAmount == v ? '#123B2A' : 'var(--bg-surface)', color: payAmount == v ? '#fff' : 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+                  style={{ padding: '5px 12px', borderRadius: '8px', border: '1.5px solid var(--border-color)', background: payAmount == v ? '#125A91' : 'var(--bg-surface)', color: payAmount == v ? '#fff' : 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
                   {formatMoney(v)}
                 </button>
               ))}
             </div>
 
-            <button type="submit" disabled={paying} style={{ width: '100%', padding: '13px', borderRadius: '10px', background: 'linear-gradient(135deg,#D6AD55,#C29A44)', color: '#0B241B', fontWeight: 800, fontSize: '1rem', border: 'none', cursor: paying ? 'not-allowed' : 'pointer', opacity: paying ? 0.7 : 1 }}>
+            <button type="submit" disabled={paying} style={{ width: '100%', padding: '13px', borderRadius: '10px', background: 'linear-gradient(135deg,#D6AD55,#C29A44)', color: '#0B3557', fontWeight: 800, fontSize: '1rem', border: 'none', cursor: paying ? 'not-allowed' : 'pointer', opacity: paying ? 0.7 : 1 }}>
               {paying ? t('finance.processing') : t('finance.confirmAmount').replace('{amount}', formatMoney(payAmount))}
             </button>
           </form>
@@ -521,8 +521,8 @@ export default function FinancePage() {
       {receiptModal && (
         <Modal onClose={() => setReceiptModal(null)}>
           <div style={{ textAlign: 'center', borderBottom: '2px dashed #DCE3DC', paddingBottom: '16px', marginBottom: '20px' }}>
-            <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#123B2A' }}>SCHOOLCONNECT 360</div>
-            <div style={{ fontSize: '0.78rem', color: '#5E6D62' }}>{t('finance.receiptTitle')}</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#125A91' }}>SCHOOLCONNECT 360</div>
+            <div style={{ fontSize: '0.78rem', color: '#60798C' }}>{t('finance.receiptTitle')}</div>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#B47214', marginTop: '8px' }}>{t('finance.receipt').toUpperCase()} #{receiptModal.receiptNumber}</div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.9rem', marginBottom: '20px' }}>
@@ -550,14 +550,14 @@ export default function FinancePage() {
               </div>
             )}
           </div>
-          <div style={{ textAlign: 'center', background: '#F7F8F5', padding: '10px', borderRadius: '8px', fontSize: '0.76rem', color: '#5E6D62', marginBottom: '20px' }}>
+          <div style={{ textAlign: 'center', background: '#F7F8F5', padding: '10px', borderRadius: '8px', fontSize: '0.76rem', color: '#60798C', marginBottom: '20px' }}>
             ✓ {t('finance.authenticated')}
           </div>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
             <button onClick={() => window.print()} style={{ padding: '9px 18px', borderRadius: '8px', border: '1.5px solid var(--border-color)', background: 'var(--bg-surface)', cursor: 'pointer', fontWeight: 700, fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Printer size={14} /> {t('finance.print')}
             </button>
-            <button onClick={() => setReceiptModal(null)} style={{ padding: '9px 20px', borderRadius: '8px', background: '#123B2A', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.88rem' }}>{t('finance.done')}</button>
+            <button onClick={() => setReceiptModal(null)} style={{ padding: '9px 20px', borderRadius: '8px', background: '#125A91', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.88rem' }}>{t('finance.done')}</button>
           </div>
         </Modal>
       )}

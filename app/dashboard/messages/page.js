@@ -10,7 +10,7 @@ import {
   MessageSquare, Send, Search, User, ChevronRight,
   Clock, CheckCheck, Bell, PlusCircle, X, Loader,
 } from 'lucide-react';
-import { useLanguage } from '@/lib/i18n';
+import { roleTranslationKey, useLanguage } from '@/lib/i18n';
 
 const timeAgo = (dateStr, locale) => {
   if (!dateStr) return '';
@@ -140,7 +140,13 @@ export default function MessagesPage() {
     `${c.full_name} ${c.role}`.toLowerCase().includes(search.toLowerCase())
   );
 
-  const roleLabel = (r) => r?.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || '';
+  const roleLabel = (role) => {
+    if (!role) return '';
+    const translated = t(roleTranslationKey(role, 'title'));
+    return translated.startsWith('role.')
+      ? role.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+      : translated;
+  };
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: '12px', color: 'var(--text-secondary)' }}>

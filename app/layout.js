@@ -1,4 +1,11 @@
 import './globals.css';
+import { Manrope } from 'next/font/google';
+
+const manrope = Manrope({
+  subsets: ['latin'],
+  variable: '--font-manrope',
+  display: 'swap',
+});
 
 export const metadata = {
   title: 'SchoolConnect 360 | Connected School Management Platform',
@@ -7,15 +14,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className={manrope.variable}>
       <body>{children}</body>
     </html>
   );

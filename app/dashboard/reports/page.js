@@ -43,7 +43,7 @@ const REVENUE_DATA = [
 
 const GENDER_DATA = [
   { name: 'Female Students', value: 54, color: '#D6AD55' },
-  { name: 'Male Students', value: 46, color: '#123B2A' },
+  { name: 'Male Students', value: 46, color: '#125A91' },
 ];
 
 const GRADE_DISTRIBUTION = [
@@ -127,7 +127,7 @@ export default function ReportsAnalyticsPage() {
             <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--color-forest)', marginTop: '4px' }}>95.6%</div>
             <div style={{ fontSize: '0.78rem', color: '#1E7E4A', fontWeight: 600, marginTop: '2px' }}>+1.8% vs last month</div>
           </div>
-          <div className="stat-icon-wrap" style={{ backgroundColor: 'rgba(18, 59, 42, 0.1)', color: 'var(--color-forest)' }}>
+          <div className="stat-icon-wrap" style={{ backgroundColor: 'rgba(18, 90, 145, 0.1)', color: 'var(--color-forest)' }}>
             <TrendingUp size={22} />
           </div>
         </div>
@@ -160,7 +160,7 @@ export default function ReportsAnalyticsPage() {
             <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--color-deep-forest)', marginTop: '4px' }}>125</div>
             <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>Zero dropouts</div>
           </div>
-          <div className="stat-icon-wrap" style={{ backgroundColor: 'rgba(18, 59, 42, 0.08)', color: 'var(--color-forest)' }}>
+          <div className="stat-icon-wrap" style={{ backgroundColor: 'rgba(18, 90, 145, 0.08)', color: 'var(--color-forest)' }}>
             <Users size={22} />
           </div>
         </div>
@@ -177,11 +177,11 @@ export default function ReportsAnalyticsPage() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={ATTENDANCE_TREND}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E8ECE8" />
-                <XAxis dataKey="day" stroke="#5E6D62" />
-                <YAxis domain={[85, 100]} stroke="#5E6D62" />
+                <XAxis dataKey="day" stroke="#60798C" />
+                <YAxis domain={[85, 100]} stroke="#60798C" />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="attendance" stroke="#123B2A" strokeWidth={3} name="Actual Attendance %" />
+                <Line type="monotone" dataKey="attendance" stroke="#125A91" strokeWidth={3} name="Actual Attendance %" />
                 <Line type="monotone" dataKey="target" stroke="#D6AD55" strokeDasharray="5 5" name="School Target (95%)" />
               </LineChart>
             </ResponsiveContainer>
@@ -197,8 +197,8 @@ export default function ReportsAnalyticsPage() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={REVENUE_DATA}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E8ECE8" />
-                <XAxis dataKey="term" stroke="#5E6D62" />
-                <YAxis stroke="#5E6D62" />
+                <XAxis dataKey="term" stroke="#60798C" />
+                <YAxis stroke="#60798C" />
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="collected" fill="#1E7E4A" name="Collected Revenue ($)" radius={[4, 4, 0, 0]} />
@@ -217,10 +217,10 @@ export default function ReportsAnalyticsPage() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={GRADE_DISTRIBUTION} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#E8ECE8" />
-                <XAxis type="number" stroke="#5E6D62" />
-                <YAxis dataKey="grade" type="category" stroke="#5E6D62" width={140} />
+                <XAxis type="number" stroke="#60798C" />
+                <YAxis dataKey="grade" type="category" stroke="#60798C" width={140} />
                 <Tooltip />
-                <Bar dataKey="count" fill="#123B2A" name="Number of Students" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="count" fill="#125A91" name="Number of Students" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

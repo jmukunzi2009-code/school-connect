@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import BrandLogo from '@/components/brand-logo';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   GraduationCap,
@@ -217,30 +218,8 @@ function DashboardWorkspace({ children }) {
       >
         {/* Brand & School Logo */}
         <div style={{ padding: '22px 20px', borderBottom: '1px solid #E1EFF8' }}>
-          <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, #39B6E9, #147FC6)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#FFFFFF',
-                border: '1px solid rgba(255, 255, 255, 0.6)',
-              }}
-            >
-              <GraduationCap size={22} />
-            </div>
-            <div>
-              <div style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--color-deep-forest)', letterSpacing: '-0.3px' }}>
-                SchoolConnect <span style={{ color: 'var(--color-forest)' }}>360</span>
-              </div>
-              <div style={{ fontSize: '0.66rem', color: '#7894A8', fontWeight: 700, letterSpacing: '0.5px' }}>
-                {t('workspace.enterprise')}
-              </div>
-            </div>
+          <Link href="/dashboard" aria-label="SchoolConnect 360 dashboard">
+            <BrandLogo tagline={t('workspace.enterprise')} />
           </Link>
         </div>
 
@@ -447,7 +426,10 @@ function DashboardWorkspace({ children }) {
             </div>
 
             {/* Notification bell */}
-            <div
+            <Link
+              href="/dashboard/messages"
+              aria-label="Open messages and school updates"
+              title="Messages and school updates"
               style={{
                 position: 'relative',
                 display: 'flex',
@@ -457,7 +439,6 @@ function DashboardWorkspace({ children }) {
                 borderRadius: '8px',
                 border: '1px solid var(--border-color)',
                 color: 'var(--text-secondary)',
-                cursor: 'pointer',
               }}
             >
               <Bell size={18} />
@@ -472,10 +453,11 @@ function DashboardWorkspace({ children }) {
                   backgroundColor: '#C0392B',
                 }}
               />
-            </div>
+            </Link>
 
             {/* Role chip */}
             <div
+              className="dashboard-role-chip"
               onClick={() => setRoleSwitchModalOpen(true)}
               style={{
                 display: 'flex',
@@ -580,7 +562,7 @@ function DashboardWorkspace({ children }) {
                       padding: '14px 16px',
                       borderRadius: '8px',
                       border: isSelected ? '2px solid var(--color-forest)' : '1px solid var(--border-color)',
-                      backgroundColor: isSelected ? 'rgba(18, 59, 42, 0.05)' : 'var(--bg-surface)',
+                      backgroundColor: isSelected ? 'rgba(18, 90, 145, 0.05)' : 'var(--bg-surface)',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',

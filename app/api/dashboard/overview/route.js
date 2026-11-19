@@ -81,15 +81,32 @@ export async function GET() {
       attendanceSummaryRes,
       recentActivityRes,
     ] = await Promise.all([
-      query(
-        `SELECT COUNT(*) FROM students WHERE school_id = $1 AND status = 'enrolled'`,
-        [schoolId]
-      ),
-      query(
-        `SELECT COUNT(*) FROM classes WHERE school_id = $1`,
-        [schoolId]
-      ),
-      canViewRoster
+      activeRole === 'class_teacher'
+        ? query(
+            `SELECT COUNT(DISTINCT s.id)::int AS count
+             FROM students s
+             JOIN enrollments e ON e.student_id = s.id AND e.status = 'active'
+             JOIN class_teachers ct ON ct.class_id = e.class_id AND ct.school_id = s.school_id
+             WHERE s.school_id = $1 AND s.status = 'enrolled' AND ct.user_id = $2`,
+            [schoolId, user.id]
+          )
+        : query(
+            `SELECT COUNT(*) FROM students WHERE school_id = $1 AND status = 'enrolled'`,
+            [schoolId]
+          ),
+      activeRole === 'class_teacher'
+        ? query(
+            `SELECT COUNT(DISTINCT c.id)::int AS count
+             FROM classes c
+             JOIN class_teachers ct ON ct.class_id = c.id AND ct.school_id = c.school_id
+             WHERE c.school_id = $1 AND ct.user_id = $2`,
+            [schoolId, user.id]
+          )
+        : query(
+            `SELECT COUNT(*) FROM classes WHERE school_id = $1`,
+            [schoolId]
+          ),
+      canViewRoster && activeRole !== 'class_teacher'
         ? query(
             `SELECT COUNT(DISTINCT user_id) FROM user_memberships WHERE school_id = $1 AND status = 'active'`,
             [schoolId]
@@ -117,15 +134,25 @@ export async function GET() {
         : Promise.resolve(null),
       canViewRoster
         ? query(
-          `SELECT s.id, s.admission_number, s.first_name, s.last_name, s.gender, s.created_at,
-                  c.name as class_name, st.name as stream_name
-           FROM students s
-           LEFT JOIN enrollments e ON e.student_id = s.id AND e.status = 'active'
-           LEFT JOIN classes c ON c.id = e.class_id
-           LEFT JOIN streams st ON st.id = e.stream_id
-           WHERE s.school_id = $1
-           ORDER BY s.created_at DESC LIMIT 5`,
-          [schoolId]
+          activeRole === 'class_teacher'
+            ? `SELECT DISTINCT s.id, s.admission_number, s.first_name, s.last_name, s.gender, s.created_at,
+                      c.name as class_name, st.name as stream_name
+               FROM students s
+               JOIN enrollments e ON e.student_id = s.id AND e.status = 'active'
+               JOIN class_teachers ct ON ct.class_id = e.class_id AND ct.school_id = s.school_id
+               LEFT JOIN classes c ON c.id = e.class_id
+               LEFT JOIN streams st ON st.id = e.stream_id
+               WHERE s.school_id = $1 AND ct.user_id = $2
+               ORDER BY s.created_at DESC LIMIT 5`
+            : `SELECT s.id, s.admission_number, s.first_name, s.last_name, s.gender, s.created_at,
+                      c.name as class_name, st.name as stream_name
+               FROM students s
+               LEFT JOIN enrollments e ON e.student_id = s.id AND e.status = 'active'
+               LEFT JOIN classes c ON c.id = e.class_id
+               LEFT JOIN streams st ON st.id = e.stream_id
+               WHERE s.school_id = $1
+               ORDER BY s.created_at DESC LIMIT 5`,
+          activeRole === 'class_teacher' ? [schoolId, user.id] : [schoolId]
         )
         : Promise.resolve({ rows: [] }),
       query(
@@ -168,7 +195,7 @@ export async function GET() {
       stats: {
         totalStudents: parseInt(studentCountRes.rows[0].count, 10),
         totalClasses: parseInt(classCountRes.rows[0].count, 10),
-        ...(canViewRoster && { totalStaff: parseInt(staffCountRes.rows[0].count, 10) }),
+        ...(canViewRoster && activeRole !== 'class_teacher' && { totalStaff: parseInt(staffCountRes.rows[0].count, 10) }),
         ...(bookCountRes && {
           totalBooks: parseInt(bookCountRes.rows[0].total, 10),
           availableBooks: parseInt(bookCountRes.rows[0].available, 10),

@@ -16,30 +16,45 @@ export async function GET(request) {
 
     // Find classes where this teacher is the class teacher OR assigned to teach a subject
     const myClassesRes = await query(
-      `SELECT DISTINCT c.id, c.name, c.level,
+      `SELECT DISTINCT c.id, c.name, c.grade_level AS level,
               CASE WHEN ct.user_id = $2 THEN true ELSE false END AS is_class_teacher,
-              (SELECT COUNT(*)::int FROM enrollments e WHERE e.class_id = c.id AND e.status = 'active') AS student_count,
+              (SELECT COUNT(*)::int FROM enrollments e WHERE e.school_id = c.school_id AND e.class_id = c.id AND e.status = 'active') AS student_count,
               STRING_AGG(DISTINCT sub.name, ', ') AS subjects_teaching
        FROM classes c
        LEFT JOIN class_teachers ct ON ct.class_id = c.id AND ct.school_id = $1
-       LEFT JOIN teacher_assignments ta ON ta.class_id = c.id AND ta.user_id = $2
+       LEFT JOIN teacher_assignments ta ON ta.class_id = c.id AND ta.teacher_id = $2
        LEFT JOIN subjects sub ON sub.id = ta.subject_id
-       WHERE c.school_id = $1 AND (ct.user_id = $2 OR ta.user_id = $2)
-       GROUP BY c.id, c.name, c.level, ct.user_id
-       ORDER BY c.level, c.name`,
+       WHERE c.school_id = $1 AND (ct.user_id = $2 OR ta.teacher_id = $2)
+       GROUP BY c.id, c.name, c.grade_level, ct.user_id
+       ORDER BY c.grade_level, c.name`,
       [schoolId, user.id]
     );
 
     if (classId) {
+      const assignedClassRes = await query(
+        `SELECT c.id
+         FROM classes c
+         WHERE c.id = $1 AND c.school_id = $2
+           AND (
+             EXISTS (SELECT 1 FROM class_teachers ct WHERE ct.class_id = c.id AND ct.school_id = c.school_id AND ct.user_id = $3)
+             OR EXISTS (SELECT 1 FROM teacher_assignments ta WHERE ta.class_id = c.id AND ta.teacher_id = $3)
+           )
+         LIMIT 1`,
+        [classId, schoolId, user.id]
+      );
+      if (!assignedClassRes.rows.length) {
+        return NextResponse.json({ error: 'This class is not assigned to your account.' }, { status: 404 });
+      }
+
       // Get students in this class
       const studentsRes = await query(
         `SELECT s.id, s.first_name, s.last_name, s.admission_number, s.gender,
                 e.id AS enrollment_id, e.roll_number
          FROM enrollments e
          JOIN students s ON s.id = e.student_id
-         WHERE e.class_id = $1 AND e.status = 'active'
+         WHERE e.class_id = $1 AND e.status = 'active' AND s.school_id = $2
          ORDER BY s.last_name, s.first_name`,
-        [classId]
+        [classId, schoolId]
       );
 
       // Check if requester is class teacher
@@ -54,7 +69,7 @@ export async function GET(request) {
         `SELECT ta.subject_id, sub.name AS subject_name, sub.code
          FROM teacher_assignments ta
          JOIN subjects sub ON sub.id = ta.subject_id
-         WHERE ta.class_id = $1 AND ta.user_id = $2`,
+         WHERE ta.class_id = $1 AND ta.teacher_id = $2`,
         [classId, user.id]
       );
 
@@ -65,9 +80,9 @@ export async function GET(request) {
           `SELECT ta.subject_id, sub.name AS subject_name, u.full_name AS teacher_name
            FROM teacher_assignments ta
            JOIN subjects sub ON sub.id = ta.subject_id
-           JOIN users u ON u.id = ta.user_id
-           WHERE ta.class_id = $1`,
-          [classId]
+           JOIN users u ON u.id = ta.teacher_id
+           WHERE ta.class_id = $1 AND ta.school_id = $2`,
+          [classId, schoolId]
         );
         allTeachers = atRes.rows;
       }
@@ -81,8 +96,12 @@ export async function GET(request) {
          JOIN exam_assessments ea ON ea.id = sm.assessment_id
          JOIN subjects sub ON sub.id = ea.subject_id
          WHERE ea.class_id = $1 AND sm.school_id = $2
+           AND ($3::boolean OR EXISTS (
+             SELECT 1 FROM teacher_assignments ta
+             WHERE ta.class_id = ea.class_id AND ta.subject_id = ea.subject_id AND ta.teacher_id = $4
+           ))
          ORDER BY sub.name, sm.student_id`,
-        [classId, schoolId]
+        [classId, schoolId, isClassTeacher, user.id]
       );
 
       // Recent attendance using direct student_attendance table
@@ -126,6 +145,28 @@ export async function POST(request) {
 
     if (action === 'add_comment') {
       const { student_id, class_id, comment, is_private } = body;
+      const assignedStudentRes = await query(
+        `SELECT s.id
+         FROM students s
+         WHERE s.id = $1 AND s.school_id = $2
+           AND EXISTS (
+             SELECT 1 FROM enrollments e
+             WHERE e.student_id = s.id AND e.class_id = $3 AND e.status = 'active'
+           )
+           AND EXISTS (
+             SELECT 1 FROM classes c
+             WHERE c.id = $3 AND c.school_id = $2
+               AND (
+                 EXISTS (SELECT 1 FROM class_teachers ct WHERE ct.class_id = c.id AND ct.school_id = c.school_id AND ct.user_id = $4)
+                 OR EXISTS (SELECT 1 FROM teacher_assignments ta WHERE ta.class_id = c.id AND ta.teacher_id = $4)
+               )
+           )
+         LIMIT 1`,
+        [student_id, schoolId, class_id, user.id]
+      );
+      if (!assignedStudentRes.rows.length) {
+        return NextResponse.json({ error: 'You can only comment on students in your assigned classes.' }, { status: 404 });
+      }
 
       // Only class teacher can see all comments; subject teachers can add
       await query(

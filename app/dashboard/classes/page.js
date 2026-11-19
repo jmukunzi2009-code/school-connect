@@ -47,13 +47,16 @@ export default function ClassManagementPage() {
       try {
         setLoading(true);
         const [clsRes, meRes] = await Promise.all([
-          fetch('/api/classes').then(r => r.json()),
-          fetch('/api/auth/me').then(r => r.json()),
+          fetch('/api/classes'),
+          fetch('/api/auth/me'),
         ]);
-        setClasses(clsRes.classes || []);
-        setTeachers(clsRes.teachers || []);
-        setSubjects(clsRes.subjects || []);
-        setUserRole(meRes.user?.activeRole);
+        const [classData, sessionData] = await Promise.all([clsRes.json(), meRes.json()]);
+        if (!clsRes.ok) throw new Error(classData.error || 'Failed to load class data.');
+        if (!meRes.ok) throw new Error(sessionData.error || 'Failed to load your account details.');
+        setClasses(classData.classes || []);
+        setTeachers(classData.teachers || []);
+        setSubjects(classData.subjects || []);
+        setUserRole(sessionData.user?.activeRole);
       } catch (e) { setError(e.message); }
       finally { setLoading(false); }
     })();
@@ -67,6 +70,7 @@ export default function ClassManagementPage() {
     try {
       const res = await fetch(`/api/classes?classId=${cls.id}`);
       const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Failed to load this class.');
       setClassStudents(d.students || []);
       setClassTeachers(d.teachers || []);
     } catch (e) { setError(e.message); }
@@ -91,8 +95,10 @@ export default function ClassManagementPage() {
       setModal(null);
       openClass(selectedClass);
       // Refresh class list
-      const clsRes = await fetch('/api/classes').then(r => r.json());
-      setClasses(clsRes.classes || []);
+      const clsRes = await fetch('/api/classes');
+      const classData = await clsRes.json();
+      if (!clsRes.ok) throw new Error(classData.error || 'Assignment saved, but the class list could not be refreshed.');
+      setClasses(classData.classes || []);
     } catch (e) { setError(e.message); }
     finally { setSubmitting(false); }
   };
@@ -142,11 +148,11 @@ export default function ClassManagementPage() {
   if (loading) return <div style={{ padding: '32px', color: 'var(--text-secondary)' }}>Loading classes…</div>;
 
   return (
-    <div style={{ padding: '28px', maxWidth: '1200px' }}>
+    <div className="dashboard-classes-page" style={{ padding: '28px', maxWidth: '1200px' }}>
       {/* Header */}
       <div style={{ marginBottom: '28px' }}>
         {view === 'detail' && (
-          <button onClick={() => { setView('grid'); setSelectedClass(null); }} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', background: 'none', border: 'none', cursor: 'pointer', color: '#5E6D62', fontSize: '0.85rem', fontWeight: 600 }}>
+          <button onClick={() => { setView('grid'); setSelectedClass(null); }} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', background: 'none', border: 'none', cursor: 'pointer', color: '#60798C', fontSize: '0.85rem', fontWeight: 600 }}>
             <ArrowLeft size={15} /> All Classes
           </button>
         )}
@@ -168,10 +174,10 @@ export default function ClassManagementPage() {
           {classes.map(cls => (
             <button key={cls.id} onClick={() => openClass(cls)}
               style={{ background: 'var(--bg-surface)', border: '1.5px solid var(--border-color)', borderRadius: '16px', padding: '22px', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', display: 'block', width: '100%' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#123B2A'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(18,59,42,0.12)'; }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#125A91'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(18,90,145,0.12)'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg,#123B2A,#1E6A45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg,#125A91,#1687D1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <GraduationCap size={22} color="#D6AD55" />
                 </div>
                 <ChevronRight size={16} color="#9BAEA2" />
@@ -181,12 +187,12 @@ export default function ClassManagementPage() {
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}><Users size={12} style={{ verticalAlign: 'middle' }} /> {cls.student_count ?? 0} students</span>
               </div>
               {cls.class_teacher_name ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 10px', borderRadius: '8px', background: 'rgba(18,59,42,0.06)' }}>
-                  <UserCheck size={13} color="#123B2A" />
-                  <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#123B2A' }}>{cls.class_teacher_name}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 10px', borderRadius: '8px', background: 'rgba(18,90,145,0.06)' }}>
+                  <UserCheck size={13} color="#125A91" />
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#125A91' }}>{cls.class_teacher_name}</span>
                 </div>
               ) : (
-                <div style={{ padding: '7px 10px', borderRadius: '8px', background: '#FFF6E5', fontSize: '0.78rem', color: '#925807', fontWeight: 600 }}>
+                <div style={{ padding: '7px 10px', borderRadius: '8px', background: '#EAF6FF', fontSize: '0.78rem', color: '#125A91', fontWeight: 600 }}>
                   ⚠ No class teacher assigned
                 </div>
               )}
@@ -207,7 +213,7 @@ export default function ClassManagementPage() {
           {/* Info + Actions bar */}
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
             {isAdmin && [
-              { label: '+ Assign Class Teacher', action: 'assign_ct', color: '#123B2A' },
+              { label: '+ Assign Class Teacher', action: 'assign_ct', color: '#125A91' },
               { label: '+ Assign Subject Teacher', action: 'assign_st', color: '#226F8A' },
               { label: '↑ Promote Student', action: 'promote', color: '#B47214' },
             ].map(b => (
@@ -226,7 +232,7 @@ export default function ClassManagementPage() {
                   Students ({classStudents.length})
                 </h2>
                 <div style={{ position: 'relative' }}>
-                  <Search size={13} style={{ position: 'absolute', left: '9px', top: '50%', transform: 'translateY(-50%)', color: '#5E6D62' }} />
+                  <Search size={13} style={{ position: 'absolute', left: '9px', top: '50%', transform: 'translateY(-50%)', color: '#60798C' }} />
                   <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…"
                     style={{ padding: '7px 10px 7px 28px', borderRadius: '8px', border: '1.5px solid var(--border-color)', fontSize: '0.82rem', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: 'inherit', outline: 'none', width: '180px' }} />
                 </div>
@@ -248,7 +254,7 @@ export default function ClassManagementPage() {
                         <td style={{ padding: '11px 16px', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{i + 1}</td>
                         <td style={{ padding: '11px 16px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg,#123B2A,#1E6A45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700, color: '#D6AD55', flexShrink: 0 }}>
+                            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg,#125A91,#1687D1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700, color: '#D6AD55', flexShrink: 0 }}>
                               {s.first_name?.charAt(0)}
                             </div>
                             <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{s.first_name} {s.last_name}</span>
@@ -281,11 +287,11 @@ export default function ClassManagementPage() {
               {/* Class teacher */}
               <div style={{ background: 'var(--bg-surface)', borderRadius: '14px', border: '1px solid var(--border-color)', padding: '20px' }}>
                 <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <UserCheck size={15} color="#123B2A" /> Class Teacher
+                  <UserCheck size={15} color="#125A91" /> Class Teacher
                 </div>
                 {selectedClass.class_teacher_name ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg,#123B2A,#1E6A45)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, color: '#D6AD55' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg,#125A91,#1687D1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, color: '#D6AD55' }}>
                       {selectedClass.class_teacher_name?.charAt(0)}
                     </div>
                     <div>
@@ -301,7 +307,7 @@ export default function ClassManagementPage() {
               {/* Subject teachers */}
               <div style={{ background: 'var(--bg-surface)', borderRadius: '14px', border: '1px solid var(--border-color)', padding: '20px' }}>
                 <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <BookOpen size={15} color="#226F8A" /> Subject Teachers ({classTeachers.length})
+                  <BookOpen size={15} color="#125A91" /> Subject Teachers ({classTeachers.length})
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {classTeachers.length === 0 && <div style={{ color: 'var(--text-secondary)', fontSize: '0.84rem' }}>No subject teachers assigned yet.</div>}
@@ -309,7 +315,7 @@ export default function ClassManagementPage() {
                     <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', borderRadius: '10px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)' }}>
                       <div>
                         <div style={{ fontWeight: 700, fontSize: '0.84rem', color: 'var(--text-primary)' }}>{t.teacher_name}</div>
-                        <div style={{ fontSize: '0.74rem', color: '#226F8A', fontWeight: 700 }}>{t.subject_name} ({t.code})</div>
+                        <div style={{ fontSize: '0.74rem', color: '#125A91', fontWeight: 700 }}>{t.subject_name} ({t.code})</div>
                       </div>
                     </div>
                   ))}
@@ -327,7 +333,7 @@ export default function ClassManagementPage() {
             <label style={lblS}>Select Teacher *</label>
             <select required value={selTeacher} onChange={e => setSelTeacher(e.target.value)} style={{ ...inpS, marginBottom: '20px' }}>
               <option value="">Choose a teacher…</option>
-              {teachers.map(t => <option key={t.id} value={t.id}>{t.full_name} ({t.role?.replace(/_/g, ' ')})</option>)}
+              {teachers.filter(t => ['teacher', 'class_teacher'].includes(t.role)).map(t => <option key={t.id} value={t.id}>{t.full_name} ({t.role?.replace(/_/g, ' ')})</option>)}
             </select>
             <button type="submit" disabled={submitting} style={btnStyle}>{submitting ? 'Saving…' : 'Assign Class Teacher'}</button>
           </form>
@@ -346,7 +352,7 @@ export default function ClassManagementPage() {
             <label style={lblS}>Select Teacher *</label>
             <select required value={selTeacher} onChange={e => setSelTeacher(e.target.value)} style={{ ...inpS, marginBottom: '20px' }}>
               <option value="">Choose teacher…</option>
-              {teachers.map(t => <option key={t.id} value={t.id}>{t.full_name}</option>)}
+              {teachers.filter(t => ['teacher', 'class_teacher'].includes(t.role)).map(t => <option key={t.id} value={t.id}>{t.full_name}</option>)}
             </select>
             <button type="submit" disabled={submitting} style={btnStyle}>{submitting ? 'Saving…' : 'Assign Subject Teacher'}</button>
           </form>
@@ -367,7 +373,7 @@ export default function ClassManagementPage() {
               </>
             )}
             {selStudentEnr && (
-              <div style={{ marginBottom: '14px', padding: '10px', borderRadius: '8px', background: '#EEF4F1', fontSize: '0.88rem', color: '#123B2A' }}>
+              <div style={{ marginBottom: '14px', padding: '10px', borderRadius: '8px', background: '#EAF6FF', fontSize: '0.88rem', color: '#125A91' }}>
                 Promoting: <strong>{classStudents.find(s => s.enrollment_id === selStudentEnr)?.first_name} {classStudents.find(s => s.enrollment_id === selStudentEnr)?.last_name}</strong> from <strong>{selectedClass?.name}</strong>
               </div>
             )}
@@ -376,10 +382,10 @@ export default function ClassManagementPage() {
               <option value="">Choose target class…</option>
               {classes.filter(c => c.id !== selectedClass?.id).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
-            <div style={{ background: '#FFF8EE', border: '1px solid #F0D88A', borderRadius: '8px', padding: '10px 14px', marginBottom: '20px', fontSize: '0.82rem', color: '#6B4D00' }}>
+            <div style={{ background: '#EAF6FF', border: '1px solid #B9DFF3', borderRadius: '8px', padding: '10px 14px', marginBottom: '20px', fontSize: '0.82rem', color: '#125A91' }}>
               ⚠ This immediately moves the student's enrollment to the selected class. The student will appear in the new class roster right away.
             </div>
-            <button type="submit" disabled={submitting} style={{ ...btnStyle, background: 'linear-gradient(135deg,#B47214,#C29A44)', color: '#fff' }}>
+            <button type="submit" disabled={submitting} style={{ ...btnStyle, background: 'linear-gradient(135deg,#1687D1,#125A91)', color: '#fff' }}>
               {submitting ? 'Promoting…' : 'Confirm Promotion'}
             </button>
           </form>
@@ -404,4 +410,4 @@ function ModalWrapper({ title, children, onClose }) {
 const alertStyle = (bg, color) => ({ display: 'flex', alignItems: 'center', gap: '8px', background: bg, color, borderRadius: '10px', padding: '12px 16px', marginBottom: '20px', fontSize: '0.88rem', fontWeight: 600 });
 const lblS = { display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '5px', letterSpacing: '0.3px' };
 const inpS = { width: '100%', padding: '10px 13px', borderRadius: '8px', border: '1.5px solid var(--border-color)', fontSize: '0.9rem', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: 'inherit', outline: 'none' };
-const btnStyle = { width: '100%', padding: '12px', borderRadius: '10px', background: 'linear-gradient(135deg,#123B2A,#1E6A45)', color: '#fff', fontWeight: 700, fontSize: '0.95rem', border: 'none', cursor: 'pointer' };
+const btnStyle = { width: '100%', padding: '12px', borderRadius: '10px', background: 'linear-gradient(135deg,#125A91,#1687D1)', color: '#fff', fontWeight: 700, fontSize: '0.95rem', border: 'none', cursor: 'pointer' };

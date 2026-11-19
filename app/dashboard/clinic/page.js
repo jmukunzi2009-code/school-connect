@@ -239,7 +239,7 @@ export default function ClinicPage() {
 
             <form onSubmit={handleRecordVisit}>
               {/* Loop: Choose Class, Then Choose Student */}
-              <div style={{ backgroundColor: 'rgba(18, 59, 42, 0.04)', padding: '16px', borderRadius: '8px', marginBottom: '16px', border: '1px solid var(--border-color)' }}>
+              <div style={{ backgroundColor: 'rgba(18, 90, 145, 0.04)', padding: '16px', borderRadius: '8px', marginBottom: '16px', border: '1px solid var(--border-color)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.88rem', fontWeight: 700, color: 'var(--color-forest)', marginBottom: '10px' }}>
                   <Sparkles size={16} color="var(--color-gold)" /> Select Enrolled Student via Class:
                 </div>
